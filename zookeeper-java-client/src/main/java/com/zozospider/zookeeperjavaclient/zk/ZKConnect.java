@@ -42,9 +42,10 @@ public class ZKConnect implements Watcher {
         log.warn("客户端开始连接zookeeper服务器...");
         log.warn("连接状态：{}", zk.getState());
 
-        new Thread().sleep(8000);
+        new Thread().sleep(3000);
 
         log.warn("连接状态：{}", zk.getState());
+
 
     }
 
