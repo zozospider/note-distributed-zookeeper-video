@@ -30,9 +30,9 @@ public class ZooKeeperConnectionMain {
 //        zooKeeperClient.create("/zkCli2", "zkCli2 data", true);
 
         // 节点是否存在
-        zooKeeperClient.exists("/zkCli");
-        zooKeeperClient.exists("/zkCli/zz");
-        zooKeeperClient.exists("/zkCliNo");
+        zooKeeperClient.exists("/zkCli", false);
+        zooKeeperClient.exists("/zkCli/zz", true);
+        zooKeeperClient.exists("/zkCliNo", true);
 
         // 获取节点数据
 //        zooKeeperClient.getData("/zkCli");

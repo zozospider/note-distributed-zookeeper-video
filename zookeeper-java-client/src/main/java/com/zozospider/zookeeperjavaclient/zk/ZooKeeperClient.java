@@ -186,15 +186,35 @@ public class ZooKeeperClient {
      * @throws KeeperException
      * @throws InterruptedException
      */
-    public boolean exists(String path) throws KeeperException, InterruptedException {
+    public void exists(String path, boolean async) throws KeeperException, InterruptedException {
 
         log.info("exists begin");
-        Stat stat = zookeeper.exists(path, false);
-        log.info("exists stat: {}", stat);
-        boolean exists = !(stat == null);
-        log.info("exists ? {} : {}", path, exists);
+        if (!async) {
+            Stat stat = zookeeper.exists(path, true);
+            log.info("exists sync stat: {}", stat);
+            boolean exists = !(stat == null);
+            log.info("exists sync ? {} : {}", path, exists);
+        } else {
+            zookeeper.exists(path, true, new AsyncCallback.StatCallback() {
+                @Override
+                public void processResult(int rc, String path, Object ctx, Stat stat) {
+                    // do something when callback
+                    if (rc == KeeperException.Code.OK.intValue()) {
+                        log.info("exists async success");
+                    } else {
+                        KeeperException.Code code = KeeperException.Code.get(rc);
+                        log.error("exists async failure, rc codeValue: {}, rc codeName: {}", code.intValue(), code.name());
+                    }
+                    log.info("exists async rc: {}, path: {}, ctx: {}, stat: {}", rc, path, ctx, stat);
+                    log.info("exists async stat: {}", stat);
+                    boolean exists = !(stat == null);
+                    log.info("exists async ? {} : {}", path, exists);
+                }
+            }, "exists async Object ctx");
+            // 仅测试（监听回调，避免主线程中止）
+            Thread.sleep(3000);
+        }
         log.info("exists end");
-        return exists;
     }
 
     /**
