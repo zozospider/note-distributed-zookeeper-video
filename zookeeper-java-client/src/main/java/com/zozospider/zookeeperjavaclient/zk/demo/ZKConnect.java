@@ -1,4 +1,4 @@
-package com.zozospider.zookeeperjavaclient.zk;
+package com.zozospider.zookeeperjavaclient.zk.demo;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * ZooKeeper 连接 demo 演示
+ * ZooKeeper 连接 demo
  */
 public class ZKConnect implements Watcher {
 
@@ -39,19 +39,18 @@ public class ZKConnect implements Watcher {
          */
         ZooKeeper zk = new ZooKeeper(zkServerPath, timeout, new ZKConnect());
 
-        log.warn("客户端开始连接zookeeper服务器...");
-        log.warn("连接状态：{}", zk.getState());
+        log.info("客户端开始连接ZooKeeper服务器...");
+        log.info("连接状态：{}", zk.getState());
 
         new Thread().sleep(3000);
 
-        log.warn("连接状态：{}", zk.getState());
-
+        log.info("连接状态：{}", zk.getState());
 
     }
 
     @Override
     public void process(WatchedEvent watchedEvent) {
-        log.warn("接受到watch通知：{}", watchedEvent);
+        log.info("接受到watch通知：{}", watchedEvent);
     }
 
 }

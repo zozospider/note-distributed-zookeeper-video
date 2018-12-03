@@ -1,4 +1,4 @@
-package com.zozospider.zookeeperjavaclient.zk;
+package com.zozospider.zookeeperjavaclient.zk.demo;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * ZooKeeper 连接 demo 演示 2（更合理）
+ * ZooKeeper 连接 demo2（更合理）
  */
 public class ZKConnect2 {
 
@@ -26,29 +26,35 @@ public class ZKConnect2 {
     private CountDownLatch countDownLatch = new CountDownLatch(1);
     protected ZooKeeper zookeeper;
 
-    public static void main(String[] args) throws Exception {
-        new ZKConnect2().connect();
-    }
     /**
      * 连接zookeeper server
      */
     public void connect() throws Exception {
-        zookeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new ConnWatcher());
-        log.info("create ZooKeeper...");
+        // 创建连接
+        log.info("create ZooKeeper begin");
+        zookeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new ZKConnect2.ConnWatcher());
+        log.info("create ZooKeeper end");
+
         // 等待连接完成
+        log.info("create ZooKeeper countDownLatch begin");
         countDownLatch.await();
-        log.info("countDownLatch end");
+        log.info("create ZooKeeper countDownLatch end");
     }
 
     public class ConnWatcher implements Watcher {
         public void process(WatchedEvent event) {
-            log.warn("接受到watch通知：{}", event);
+            log.info("ConnWatcher 接受到watch通知：{}", event);
             // 连接建立, 回调process接口时, 其event.getState()为KeeperState.SyncConnected
             if (event.getState() == Event.KeeperState.SyncConnected) {
+                log.info("ConnWatcher 接受到watch通知：SyncConnected");
                 // 放开闸门, wait在connect方法上的线程将被唤醒
                 countDownLatch.countDown();
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        new ZKConnect2().connect();
     }
 
 }
