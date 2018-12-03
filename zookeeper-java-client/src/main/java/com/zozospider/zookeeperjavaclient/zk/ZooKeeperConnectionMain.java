@@ -21,29 +21,36 @@ public class ZooKeeperConnectionMain {
         zooKeeperClient.getChildren("/", true);
 
         // 创建持久节点（同步）
-//        zooKeeperClient.create("/zkCli", "zkcli data", false);
+//        zooKeeperClient.create("/zkCli", "zkCli data", false);
 
         // 创建持久节点（异步）
-//        zooKeeperClient.create("/zkCli2", "zkcli2 data", true);
+//        zooKeeperClient.create("/zkCli/zz", "zz data", true);
+
+        // 创建持久节点（异步）
+//        zooKeeperClient.create("/zkCli2", "zkCli2 data", true);
 
         // 节点是否存在
         zooKeeperClient.exists("/zkCli");
+        zooKeeperClient.exists("/zkCli/zz");
         zooKeeperClient.exists("/zkCliNo");
 
         // 获取节点数据
-        zooKeeperClient.getData("/zkcli");
+//        zooKeeperClient.getData("/zkCli");
 
         // 修改节点数据（同步）
-//        zooKeeperClient.setData("/zkcli", "zkCli newData", 0, false);
+//        zooKeeperClient.setData("/zkCli", "zkCli newData", 0, false);
 
         // 修改节点数据（异步）
-//        zooKeeperClient.setData("/zkcli", "zkCli newData 2", 1, true);
+//        zooKeeperClient.setData("/zkCli", "zkCli newData 2", 1, true);
 
         // 获取节点数据
-        zooKeeperClient.getData("/zkcli");
+//        zooKeeperClient.getData("/zkCli");
 
         // 删除节点（同步）
-        zooKeeperClient.delete("/zkcli", 1, true);
+//        zooKeeperClient.delete("/zkCli", 0, false);
+
+        // 删除节点（同步）
+//        zooKeeperClient.delete("/zkCli2", 2, true);
 
     }
 

@@ -118,8 +118,8 @@ public class ZooKeeperClient {
         // CreateMode.PERSISTENT:        创建持久节点
         if (!async) {
             // 同步
-            String str = zookeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-            log.info("create sync str: {}", str);
+            String string = zookeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+            log.info("create sync string: {}", string);
         } else {
             // 异步
             zookeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT, new AsyncCallback.StringCallback() {
@@ -156,6 +156,7 @@ public class ZooKeeperClient {
         if (!async) {
             // 同步
             zookeeper.delete(path, version);
+            log.info("delete success");
         } else {
             // 异步
             zookeeper.delete(path, version, new AsyncCallback.VoidCallback() {
