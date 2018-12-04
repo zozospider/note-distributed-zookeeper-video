@@ -1,6 +1,6 @@
 package com.zozospider.zookeeperjavaclient.zk;
 
-public class ZooKeeperConnectionMain {
+public class ZooKeeperClientMain {
 
     public static final String CONNECT_STRING = "123.207.120.205:2181,193.112.38.200:2181,111.230.233.137:2181";
 
