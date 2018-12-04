@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>zookeeper-java-client</artifactId>
+    <artifactId>zookeeper-curator</artifactId>
 
-    <name>zookeeper-java-client</name>
+    <name>zookeeper-curator</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,14 +20,6 @@
     </properties>
 
     <dependencies>
-
-        <!-- ZooKeeper -->
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>3.4.13</version>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
