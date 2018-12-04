@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * ZooKeeper Java client
+ * 参考：https://my.oschina.net/xianggao/blog/531936
  */
 public class ZooKeeperClient {
 
