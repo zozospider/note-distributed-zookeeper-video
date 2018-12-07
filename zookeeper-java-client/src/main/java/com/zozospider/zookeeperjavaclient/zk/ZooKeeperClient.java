@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ZooKeeperClient {
 
-    final static Logger log = LoggerFactory.getLogger(ZooKeeperClient.class);
+    private final static Logger log = LoggerFactory.getLogger(ZooKeeperClient.class);
 
     /**
      * 指定连接的超时时间
