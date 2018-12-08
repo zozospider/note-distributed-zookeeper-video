@@ -6,15 +6,20 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.BackgroundCallback;
 import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.framework.api.CuratorWatcher;
+import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.retry.*;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -71,6 +76,11 @@ public class CuratorClient {
         return retryPolicy3;
     }
 
+    /**
+     * 连接客户端（匿名）
+     *
+     * @param connectString list of servers to connect to
+     */
     public void connect(String connectString) {
         // 选择一个策略
         RetryPolicy retryPolicy = getRetryPolicy();
@@ -86,9 +96,36 @@ public class CuratorClient {
         client.start();
     }
 
+    /**
+     * 连接客户端（digest 注册登录）
+     *
+     * @param connectString list of servers to connect to
+     * @param digestAuth    digest 登录模式下的用户名密码，格式: user:password，如: user1:123456
+     */
+    public void conenctWithACL(String connectString, String digestAuth) {
+        // 选择一个策略
+        RetryPolicy retryPolicy = getRetryPolicy();
+        // 创建包含隔离命名空间，ACL 的会话
+        client = CuratorFrameworkFactory.builder()
+                .retryPolicy(retryPolicy)
+                .connectString(connectString)
+                .sessionTimeoutMs(SESSION_TIMEOUT)
+                .connectionTimeoutMs(CONNECTION_TIMEOUT)
+                .namespace(NAME_SPACE)
+                .authorization("digest", digestAuth.getBytes())
+                .build();
+
+    }
+
+    /**
+     * 关闭客户端
+     */
     public void closeClient() {
         if (client != null) {
             this.client.close();
+        }
+        if (client != null) {
+            log.info("当前状态: {}", client.isStarted() ? "连接中" : "已关闭");
         }
     }
 
@@ -134,6 +171,25 @@ public class CuratorClient {
                 .withMode(CreateMode.PERSISTENT)
                 .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
                 .forPath(path, data.getBytes());
+
+        // 创建一个节点，指定创建模式（持久节点），附带初始化内容，并且自动递归创建父节点，并且指定 ACL
+        // 注: 此方式需要通过 conenctWithACL() digest 注册登录后调用。
+        List<ACL> acls = new ArrayList<>();
+        Id user1 = new Id("digest", DigestAuthenticationProvider.generateDigest("user1:123456"));
+        Id user2 = new Id("digest", DigestAuthenticationProvider.generateDigest("user2:456789"));
+        acls.add(new ACL(ZooDefs.Perms.ALL, user1));
+        acls.add(new ACL(ZooDefs.Perms.READ, user2));
+        acls.add(new ACL(ZooDefs.Perms.DELETE | ZooDefs.Perms.CREATE, user2));
+        // 创建并设置 ACL
+        client.create()
+                .creatingParentContainersIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .withACL(acls)
+                .forPath(path, data.getBytes());
+        // 设置 ACL
+        client.setACL()
+                .withACL(acls)
+                .forPath(path);
     }
 
     /**
@@ -301,23 +357,100 @@ public class CuratorClient {
 
     /**
      * 缓存 cache: path cache
+     * Path Cache 用来监控一个 ZNode 的子节点。当一个子节点增加，更新，删除时，Path Cache 会改变它的状态，会包含最新的子节点，子节点的数据和状态。
+     * 而状态的更变将通过 PathChildrenCacheListener 通知。
      */
-    public void pathCache() {
+    public void pathCache() throws Exception {
 
+        // 如果 cacheData 值设置为 false，则 event.getData().getData()、data.getData() 将返回 null，cache 将不会缓存节点数据。
+        final PathChildrenCache cache = new PathChildrenCache(client, "/example/pathChildrenCache", true);
+        /**
+         * NORMAL: 正常初始化
+         * BUILD_INITIAL_CACHE: 同步初始化，在调用 start() 之前会调用 rebuild()。
+         * POST_INITIALIZED_EVENT: 异步初始化，当 Cache 初始化数据后发送一个 PathChildrenCacheEvent.Type#INITIALIZED 事件。
+         */
+        cache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+
+        // 添加监听
+        cache.getListenable().addListener(new PathChildrenCacheListener() {
+            @Override
+            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+
+                log.info("client: {}, event: {}", client, event);
+
+                if (PathChildrenCacheEvent.Type.INITIALIZED.equals(event.getType())) {
+
+                    log.info("节点初始化 OK");
+
+                } else if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(event.getType())) {
+
+                    if ("/example/pathChildrenCache/test01".equals(event.getData().getPath())) {
+                        log.info("添加子节点: {}, 数据: {}", event.getData().getPath(), new String(event.getData().getData()));
+                    } else if ("/example/pathChildrenCache/e".equals(event.getData().getPath())) {
+                        log.info("添加子节点错误");
+                    }
+
+                } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(event.getType())) {
+
+                    log.info("修改子节点: {}, 数据: {}", event.getData().getPath(), new String(event.getData().getData()));
+
+                } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(event.getType())) {
+
+                    log.info("删除子节点: {}", event.getData().getPath());
+
+                }
+            }
+        });
+
+        Thread.sleep(100000);
     }
 
     /**
      * 缓存 cache: node cache
+     * 与 Path Cache 类似，监听某一个特定的节点。
      */
-    public void nodeCache() {
+    public void nodeCache() throws Exception {
 
+        final NodeCache cache = new NodeCache(client, "/example/nodeCache");
+
+        // buildInitial: 初始化的时候获取 node 的值并且缓存，默认为 false
+        cache.start(true);
+
+        cache.getListenable().addListener(new NodeCacheListener() {
+
+            @Override
+            public void nodeChanged() throws Exception {
+
+                if (cache.getCurrentData() != null) {
+                    log.info("节点: {}, 数据: {}", cache.getCurrentData().getPath(), new String(cache.getCurrentData().getData()));
+                } else {
+                    log.info("节点数据为空，节点被删除");
+                }
+            }
+
+        });
+        Thread.sleep(100000);
     }
 
     /**
      * 缓存 cache: tree cache
+     * 可以监控整个树上的所有节点，类似于PathCache和NodeCache的组合。
      */
-    public void treeCache() {
+    public void treeCache() throws Exception {
 
+        TreeCache cache = new TreeCache(client, "/example/treeCache");
+
+        cache.start();
+
+        cache.getListenable().addListener(new TreeCacheListener() {
+
+            @Override
+            public void childEvent(CuratorFramework client, TreeCacheEvent event) throws Exception {
+
+                log.info("client: {}, event: {}", client, event);
+                log.info("事件类型: {}, 路径: {}", event.getType(), event.getData() == null ? null : event.getData().getPath());
+            }
+        });
     }
 
 }
