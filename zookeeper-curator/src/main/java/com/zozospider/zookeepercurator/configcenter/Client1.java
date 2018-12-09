@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * 模拟配置中心客户端逻辑，监听 ZooKeeper 配置对象变更数据
+ */
 public class Client1 {
 
     private final static Logger log = LoggerFactory.getLogger(Client1.class);
