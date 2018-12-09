@@ -59,13 +59,19 @@ public class ZooKeeperClient {
      * @param connectString ZooKeeper server列表，以逗号隔开。
      *                      ZooKeeper 对象初始化后，将从 server 列表中选择一个 server，并尝试与其建立连接。
      *                      如果连接建立失败，则会从列表的剩余项中选择一个 server，并再次尝试建立连接。
+     *                      可在后面加上根目录，如 123.207.120.205:2181,193.112.38.200:2181,111.230.233.137:2181/zk-book，所有操作将在此目录下进行，类似 Curator 的命名空间。
      * @throws Exception
      */
     public void connect(String connectString) throws Exception {
 
+        /**
+         * sessionTimeout: 会话超时时间，ZooKeeper 客户端和服务端通过心跳检测会话有效性。如果在 sessionTimeout 时间内没有进行有效的心跳检测，会话就会失效。
+         * canBeReadOnly: 默认为false，表示如果 ZooKeeper 节点和过半机器失去连接，那么将不再提供读写服务。如为 true，将继续提供读服务（不提供写服务）。
+         */
         // 创建连接
         log.info("connect ZooKeeper begin");
-        zookeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new ZooKeeperClient.ConnWatcher());
+        zookeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new ZooKeeperClient.ConnWatcher(),
+                false);
         log.info("create ZooKeeper sessionId: 0x{}", Long.toHexString(zookeeper.getSessionId()));
         log.info("connect ZooKeeper end");
 
