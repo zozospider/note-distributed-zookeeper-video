@@ -131,9 +131,6 @@ public class CuratorClient {
 
     /**
      * 创建节点
-     */
-    /**
-     * 创建节点
      *
      * @param path 节点路径
      * @param data 节点数据
@@ -156,6 +153,7 @@ public class CuratorClient {
                 .withMode(CreateMode.EPHEMERAL)
                 .forPath(path, data.getBytes());
         // 创建一个节点，指定创建模式（临时节点），附带初始化内容，并且自动递归创建父节点
+        // 需要注意点 是，由于在 ZooKeeper 中规定了所有非叶子节点必须为持久节点，所以该 API 调用后，只有 path 参数对应的数据节点是临时节点，其父节点均为持久节点。
         client.create()
                 .creatingParentContainersIfNeeded()
                 .withMode(CreateMode.EPHEMERAL)
