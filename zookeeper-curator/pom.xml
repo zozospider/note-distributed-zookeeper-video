@@ -32,6 +32,18 @@
             <artifactId>curator-recipes</artifactId>
             <version>4.0.1</version>
         </dependency>
+        <!-- If you want to use Curator's test lib with Zookeeper 3.4.x you need to use the older version (as Curator itself does in the curator-test-zk34 module) -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-test</artifactId>
+            <version>2.12.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- ZooKeeper -->
         <dependency>
