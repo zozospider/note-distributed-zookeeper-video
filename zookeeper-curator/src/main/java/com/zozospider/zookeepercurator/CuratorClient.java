@@ -318,6 +318,25 @@ public class CuratorClient {
                 .inBackground(new BackgroundCallback() {
                     @Override
                     public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
+                        /**
+                         * type 主要包括以下：
+                         * CREATE: Curator Framework#create()
+                         * DELETE: Curator Framework#delete()
+                         * EXISTS: Curator Framework#check Exists()
+                         * GET_DATA: Curator Framework#getData()
+                         * SET_DATA: Curator Framework#setData()
+                         * CHILDREN: Curator Framework#getChildren()
+                         * SYNC: Curator Framework#sync(String, Object)
+                         * GET_ACL: Curator Framework#getACL()
+                         * WATCHED: Curator Framework#using Watcher(Watcher)
+                         * CLOSING: ZooKeeper 客户端与服务端断开事件
+                         *
+                         * code 主要包括以下：
+                         * 0: OK
+                         * -4: ConnectionLoss
+                         * -110: NodeExists
+                         * -112: SessionExpired
+                         */
                         log.info("eventType: {}, resultCode: {}", event.getType(), event.getResultCode());
                         log.info("client: {}, event: {}", client, event);
                     }
@@ -354,13 +373,13 @@ public class CuratorClient {
     }
 
     /**
-     * 缓存 cache: path cache
-     * Path Cache 用来监控一个 ZNode 的子节点。当一个子节点增加，更新，删除时，Path Cache 会改变它的状态，会包含最新的子节点，子节点的数据和状态。
-     * 而状态的更变将通过 PathChildrenCacheListener 通知。
+     * 缓存 cache: 子节点监听 path children cache
+     * Path Children Cache 用来监控一个 ZNode 的子节点。当一个子节点增加，更新，删除时，Path Children Cache 会改变它的状态，会包含最新的子节点，子节点的数据和状态。状态的更变将通过 PathChildrenCacheListener 通知。
+     * 注: 无法对二级子节点进行监听。
      */
-    public void pathCache() throws Exception {
+    public void pathChildrenCache() throws Exception {
 
-        // 如果 cacheData 值设置为 false，则 event.getData().getData()、data.getData() 将返回 null，cache 将不会缓存节点数据。
+        // cacheData 用于配置是否把节点内容缓存起来，如果 true，客户端在接收到节点列表变更的同时，也能获取节点的数据。否则，无法获取节点数据。
         final PathChildrenCache cache = new PathChildrenCache(client, "/example/pathChildrenCache", true);
         /**
          * NORMAL: 正常初始化
@@ -404,14 +423,14 @@ public class CuratorClient {
     }
 
     /**
-     * 缓存 cache: node cache
+     * 缓存 cache: 节点监听 node cache
      * 与 Path Cache 类似，监听某一个特定的节点。
      */
     public void nodeCache() throws Exception {
 
         final NodeCache cache = new NodeCache(client, "/example/nodeCache");
 
-        // buildInitial: 初始化的时候获取 node 的值并且缓存，默认为 false
+        // buildInitial: 初始化的时候获取 node 的值并且缓存，默认为 false。
         cache.start(true);
 
         cache.getListenable().addListener(new NodeCacheListener() {
@@ -432,7 +451,7 @@ public class CuratorClient {
 
     /**
      * 缓存 cache: tree cache
-     * 可以监控整个树上的所有节点，类似于PathCache和NodeCache的组合。
+     * 可以监控整个树上的所有节点，类似于 PathChildrenCache 和 NodeCache 的组合。
      */
     public void treeCache() throws Exception {
 
