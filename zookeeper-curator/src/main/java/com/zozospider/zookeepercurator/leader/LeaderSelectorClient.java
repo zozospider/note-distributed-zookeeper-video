@@ -22,7 +22,7 @@ public class LeaderSelectorClient {
 
     private final static Logger log = LoggerFactory.getLogger(LeaderSelectorClient.class);
 
-    protected static String PATH = "/leader/selector";
+    protected static String PATH = "/leader/selector/client";
     private static final int CLIENT_QTY = 5;
 
     public static void main(String[] args) throws Exception {
