@@ -39,13 +39,13 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
     }
 
     /**
-     * 被选举为 Leader 时触发，方法结束时放弃 Leader，重新选举
+     * 被选举为 Leader 时触发，方法结束时会立即释放 Leader，重新选举
      *
      * @param client 客户端
      * @throws Exception
      */
     @Override
-    public void takeLeadership(CuratorFramework client) throws Exception {
+    public void takeLeadership(CuratorFramework client) {
 
         log.info("current Client: {} is now the leader, It has been leader {} time(s) before ...", name, leaderCount.getAndIncrement());
 
@@ -58,8 +58,8 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
             log.info("Client: {} was interrupted", name);
             Thread.currentThread().interrupt();
         } finally {
-            // 该方法执行结束，即放弃 Leader，重新选举。
-            // 如果你想要要此实例一直是leader的话可以加一个死循环。
+            // 该方法结束时会立即释放 Leader，重新选举
+            // 如果你想要要此实例一直是leader的话可以加一个死循环
             log.info("current Client: {} relinquishing leadership", name);
         }
     }
