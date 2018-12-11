@@ -3,34 +3,34 @@ package com.zozospider.zookeepercurator.leader;
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.leader.LeaderLatch;
-import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * Leader 选举过程：在任务开始前，哪个节点都不知道谁是 leader 或 coordinator。当选举算法开始执行后，最终会产生一个唯一节点作为 leader。
+ * LeaderLatch 选举第二版
  * <p>
- * leaderLatch.start() 一旦启动，leaderLatch 会和其他 leaderLatch 交涉，选出一个作为 leader，此过程会阻塞。
+ * 参考 LeaderLatchSingle
  */
 public class LeaderLatchClient {
 
     private final static Logger log = LoggerFactory.getLogger(LeaderLatchClient.class);
 
-    private static final String PATH = "/leader";
-    private static final int CLIENT_QTY = 10;
+    private static final String PATH = "/leader/latch/client";
+    private static final int CLIENT_QTY = 5;
 
     public static void main(String[] args) throws Exception {
 
         // 模拟多个客户端
         List<CuratorFramework> clients = Lists.newArrayList();
-        // 多个 LeaderLatch 实例，为多个客户端提供选举
-        List<LeaderLatch> latches = Lists.newArrayList();
+        // 多个 LeaderLatchAdapter 选举对象适配器
+        List<LeaderLatchAdapter> adapters = Lists.newArrayList();
         // 模拟服务端
         TestingServer server = new TestingServer();
         try {
@@ -42,66 +42,60 @@ public class LeaderLatchClient {
                 CuratorFramework client = CuratorFrameworkFactory.newClient(
                         server.getConnectString(), new RetryNTimes(3, 5000));
 
-                // 创建 LeaderLatch 选举对象
-                LeaderLatch latch = new LeaderLatch(client, PATH, "Client #" + i);
-
-                // LeaderLatch 监听是否被选举为 Leader
-                latch.addListener(new LeaderLatchListener() {
-                    @Override
-                    public void isLeader() {
-                        log.info("I am leader");
-                    }
-
-                    @Override
-                    public void notLeader() {
-                        log.info("I am not leader");
-                    }
-                });
+                // 创建 LeaderLatchAdapter 选举对象适配器（也可使用匿名对象实现）
+                LeaderLatchAdapter adapter = new LeaderLatchAdapter(client, PATH, "Client #" + i);
 
                 // 添加到集合（用于 finally 关闭连接）
                 clients.add(client);
-                latches.add(latch);
+                adapters.add(adapter);
 
                 // 启动客户端并加入选举
                 client.start();
-                latch.start();
-                log.info("client {} start, LeaderLatch start", i);
+                adapter.start();
+
+                log.info("client {} start, LeaderLatchAdapter start", i);
             }
 
             // 等待选举结果
-            Thread.sleep(20000);
+            Thread.sleep(5000);
 
-            // 遍历筛选出被选为 leader 的选举对象
-            LeaderLatch currentLeader = null;
-            for (LeaderLatch latch : latches) {
-                if (latch.hasLeadership()) {
-                    currentLeader = latch;
+            // 遍历筛选出被选为 leader 的选举对象适配器
+            LeaderLatchAdapter currentLeaderAdapter = null;
+            for (LeaderLatchAdapter adapter : adapters) {
+                if (adapter.hasLeadership()) {
+                    currentLeaderAdapter = adapter;
                 }
             }
-            log.info("current leader id: {}", currentLeader.getId());
+            log.info("current Client: {}, current leader id: {}", currentLeaderAdapter.getName(), currentLeaderAdapter.getLeaderLatch().getId());
 
             // 模拟释放当前 leader，其他客户端重新选举出新 leader
-            currentLeader.close();
-            log.info("current leader id: {} closed", currentLeader.getId());
+            currentLeaderAdapter.close();
+            log.info("current Client: {} closed", currentLeaderAdapter.getName());
 
             // 再次等待选举结果
-            Thread.sleep(20000);
-            for (LeaderLatch latch : latches) {
-                if (latch.hasLeadership()) {
-                    currentLeader = latch;
+            Thread.sleep(5000);
+            for (LeaderLatchAdapter adapter : adapters) {
+                if (adapter.hasLeadership()) {
+                    currentLeaderAdapter = adapter;
                 }
             }
-            log.info("current new leader id: {}", currentLeader.getId());
+            log.info("current new Client: {}, current new leader id: {}", currentLeaderAdapter.getName(), currentLeaderAdapter.getLeaderLatch().getId());
 
-            log.info("close LeaderLatch and CuratorFramework");
+            // 关闭
+            log.info("Press enter return to quit");
+            new BufferedReader(new InputStreamReader(System.in)).readLine();
+            log.info("close LeaderSelectorAdapter and CuratorFramework");
+
         } finally {
-            // 关闭 LeaderLatch 选举对象和 CuratorFramework 客户端
-            for (LeaderLatch latch : latches) {
-                CloseableUtils.closeQuietly(latch);
+            // 关闭 LeaderLatchAdapter 选举对象适配器和 CuratorFramework 客户端
+            for (LeaderLatchAdapter adapter : adapters) {
+                CloseableUtils.closeQuietly(adapter);
             }
             for (CuratorFramework client : clients) {
                 CloseableUtils.closeQuietly(client);
             }
+            // 关闭模拟服务端
+            CloseableUtils.closeQuietly(server);
         }
     }
 
