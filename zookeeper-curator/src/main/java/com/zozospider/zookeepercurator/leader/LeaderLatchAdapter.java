@@ -10,6 +10,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * LeaderLatch 适配器类
+ * <p>
+ * LeaderLatch 为其成员变量。同时实现了 LeaderLatch.addListener() 方法的参数 LeaderLatchListener 类。
+ */
 public class LeaderLatchAdapter implements LeaderLatchListener, Closeable {
 
     private final static Logger log = LoggerFactory.getLogger(LeaderLatchAdapter.class);

@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * LeaderSelector 适配器类
+ * <p>
+ * LeaderSelector 为其成员变量。同时实现了 new LeaderSelector() 构造方法的参数 LeaderSelectorListener 类。
+ */
 public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter implements Closeable {
 
     private final static Logger log = LoggerFactory.getLogger(LeaderSelectorAdapter.class);
