@@ -20,6 +20,8 @@ import java.util.List;
  * <p>
  * leaderLatch.start() 一旦启动，leaderLatch 会和其他 leaderLatch 交涉，选出一个作为 leader，此过程会阻塞。
  * <p>
+ * 一旦某个客户端成为 Leader，将一直保持 Leader 身份，除非自身原因关闭或异常。
+ * <p>
  * 参考 LeaderLatchClient
  */
 public class LeaderLatchSingle {
