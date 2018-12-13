@@ -22,11 +22,11 @@ import java.util.List;
  * <p>
  * 一旦某个客户端成为 Leader，将一直保持 Leader 身份，除非自身原因关闭或异常。
  * <p>
- * 参考 LeaderLatchClient
+ * 参考 LeaderLatchMultiMain
  */
-public class LeaderLatchSingle {
+public class LeaderLatchSingleMain {
 
-    private final static Logger log = LoggerFactory.getLogger(LeaderLatchSingle.class);
+    private final static Logger log = LoggerFactory.getLogger(LeaderLatchSingleMain.class);
 
     private static final String PATH = "/leader/latch/single";
     private static final int CLIENT_QTY = 5;
@@ -35,10 +35,13 @@ public class LeaderLatchSingle {
 
         // 模拟多个客户端
         List<CuratorFramework> clients = Lists.newArrayList();
+
         // 多个 LeaderLatch 实例，为多个客户端提供选举
         List<LeaderLatch> latches = Lists.newArrayList();
+
         // 模拟服务端
         TestingServer server = new TestingServer();
+
         try {
 
             // 模拟多个客户端参与选举逻辑

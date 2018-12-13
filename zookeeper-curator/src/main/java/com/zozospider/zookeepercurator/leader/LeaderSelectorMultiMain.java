@@ -16,11 +16,11 @@ import java.util.List;
 /**
  * LeaderSelector 选举第二版
  * <p>
- * 参考 LeaderSelectorSingle
+ * 参考 LeaderSelectorSingleMain
  */
-public class LeaderSelectorClient {
+public class LeaderSelectorMultiMain {
 
-    private final static Logger log = LoggerFactory.getLogger(LeaderSelectorClient.class);
+    private final static Logger log = LoggerFactory.getLogger(LeaderSelectorMultiMain.class);
 
     protected static String PATH = "/leader/selector/client";
     private static final int CLIENT_QTY = 5;
@@ -29,10 +29,13 @@ public class LeaderSelectorClient {
 
         // 模拟多个客户端
         List<CuratorFramework> clients = Lists.newArrayList();
+
         // 多个 LeaderSelectorAdapter 选举对象适配器
         List<LeaderSelectorAdapter> adapters = Lists.newArrayList();
+
         // 模拟服务端
         TestingServer server = new TestingServer();
+
         try {
 
             // 模拟多个客户端参与选举逻辑

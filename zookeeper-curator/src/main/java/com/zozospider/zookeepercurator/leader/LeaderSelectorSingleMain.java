@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * 类似 LeaderLatch，所有存活的客户端不间断的轮流做 Leader。
  * <p>
- * 参考 LeaderSelectorClient
+ * 参考 LeaderSelectorMultiMain
  */
-public class LeaderSelectorSingle {
+public class LeaderSelectorSingleMain {
 
-    private final static Logger log = LoggerFactory.getLogger(LeaderSelectorSingle.class);
+    private final static Logger log = LoggerFactory.getLogger(LeaderSelectorSingleMain.class);
 
     private static final String PATH = "/leader/selector/single";
     private static final int CLIENT_QTY = 5;
@@ -32,10 +32,13 @@ public class LeaderSelectorSingle {
 
         // 模拟多个客户端
         List<CuratorFramework> clients = Lists.newArrayList();
+
         // 多个 LeaderSelector 选举对象
         List<LeaderSelector> selectors = Lists.newArrayList();
+
         // 模拟服务端
         TestingServer server = new TestingServer();
+
         try {
 
             // 模拟多个客户端参与选举逻辑

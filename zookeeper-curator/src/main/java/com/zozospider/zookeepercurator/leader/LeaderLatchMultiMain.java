@@ -16,11 +16,11 @@ import java.util.List;
 /**
  * LeaderLatch 选举第二版
  * <p>
- * 参考 LeaderLatchSingle
+ * 参考 LeaderLatchSingleMain
  */
-public class LeaderLatchClient {
+public class LeaderLatchMultiMain {
 
-    private final static Logger log = LoggerFactory.getLogger(LeaderLatchClient.class);
+    private final static Logger log = LoggerFactory.getLogger(LeaderLatchMultiMain.class);
 
     private static final String PATH = "/leader/latch/client";
     private static final int CLIENT_QTY = 5;
@@ -29,10 +29,13 @@ public class LeaderLatchClient {
 
         // 模拟多个客户端
         List<CuratorFramework> clients = Lists.newArrayList();
+
         // 多个 LeaderLatchAdapter 选举对象适配器
         List<LeaderLatchAdapter> adapters = Lists.newArrayList();
+
         // 模拟服务端
         TestingServer server = new TestingServer();
+
         try {
 
             // 模拟多个客户端参与选举逻辑
