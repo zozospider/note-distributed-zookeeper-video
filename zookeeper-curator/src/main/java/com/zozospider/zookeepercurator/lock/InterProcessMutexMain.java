@@ -40,9 +40,9 @@ public class InterProcessMutexMain {
 
         try {
 
-            // 新建 3 个异步任务
-            // 每个任务新建 1 个 Operator，包含 1 个 lock
-            // 每个任务调用 5 次 operator.doLock()
+            // 新建 3 个异步任务（线程）
+            // 每个任务（线程）新建 1 个 Operator，包含 1 个 lock
+            // 每个任务（线程）调用 5 次 operator.doLock()
             for (int i = 0; i < CLIENT_QTY; i++) {
                 final int ii = i;
 
@@ -62,7 +62,7 @@ public class InterProcessMutexMain {
                             // 新建 1 个 Operator，包含 1 个 lock
                             final InterProcessMutexOperator operator = new InterProcessMutexOperator(resource, "C" + ii,
                                     client, LOCK_PATH);
-                            // 每个任务调用 5 次 operator.doLock()
+                            // 每个任务（线程）调用 5 次 operator.doLock()
                             for (int j = 0; j < DO_TIMES; j++) {
                                 // 获取锁并访问共享资源对象，完成后释放锁
                                 operator.doLock(j);

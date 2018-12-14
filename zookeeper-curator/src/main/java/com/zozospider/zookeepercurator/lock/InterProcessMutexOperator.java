@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 可重入共享锁（Shared Reentrant Lock）
- * 同一个客户端在拥有锁的同时，可以多次获取，不会被阻塞。
+ * 同一个客户端在拥有锁的同时，可以在一个线程中多次调用 lock.acquire() 获取锁。
  * <p>
  * acquire(): 获取锁
  * release(): 释放锁

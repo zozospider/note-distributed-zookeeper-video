@@ -40,8 +40,9 @@ public class LimitedResource {
         }
         try {
             // 模拟资源正在被使用
-            log.info("doSource, current Client: {}, using ...", name);
-            Thread.sleep((long) (3000 * Math.random()));
+            long time = (long) (3000 * Math.random());
+            log.info("doSource, current Client: {}, using {}ms ...", name, time);
+            Thread.sleep(time);
         } finally {
             // 使用完毕，将 source 重置为 false（可被使用状态）
             source.set(false);
