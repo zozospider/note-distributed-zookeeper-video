@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 可重入共享锁（Shared Reentrant Lock）
- * 同一个客户端（线程）在拥有一个 InterProcessMutex 锁时，可以在一个线程中多次调用 lock.acquire() 获取锁。并在使用结束后，多次调用 lock.release() 释放锁。示例参考 doLockTwice() 方法。
+ * <p>
+ * 同一个客户端（线程）在拥有一个 InterProcessMutex 锁时，一个线程在释放锁前可以多次调用 lock.acquire() 获取锁而不会阻塞。并在使用结束后，多次调用 lock.release() 释放锁。示例参考 doLockTwice() 方法。
  * <p>
  * acquire(): 获取锁
  * release(): 释放锁
@@ -41,8 +42,8 @@ public class InterProcessMutexOperator {
         this.lock = new InterProcessMutex(client, lockPath);
     }
 
-    private static final long time = 10l;
-    private static final TimeUnit unit = TimeUnit.SECONDS;
+    private static final long TIME = 10l;
+    private static final TimeUnit UNIT = TimeUnit.SECONDS;
 
     /**
      * 获取一次锁并访问共享资源对象，完成后释放一次锁
@@ -54,7 +55,7 @@ public class InterProcessMutexOperator {
 
         log.info("doLockOnce, current Client: {}#{}, lock acquire ...", name, j);
         // 获取锁（此处如果有其他线程使用锁，则需阻塞等待直到其释放才能获取）
-        boolean bool = lock.acquire(time, unit);
+        boolean bool = lock.acquire(TIME, UNIT);
         if (bool) {
             log.info("doLockOnce, current Client: {}#{}, lock acquire successfully", name, j);
         } else {
@@ -88,7 +89,7 @@ public class InterProcessMutexOperator {
 
         log.info("doLockTwice, current Client: {}#{}, lock acquire 1 ...", name, j);
         // 获取锁（此处如果有其他线程使用锁，则需阻塞等待直到其释放才能获取）
-        boolean bool = lock.acquire(time, unit);
+        boolean bool = lock.acquire(TIME, UNIT);
         if (bool) {
             log.info("doLockTwice, current Client: {}#{}, lock acquire 1 successfully", name, j);
         } else {
@@ -99,7 +100,7 @@ public class InterProcessMutexOperator {
         log.info("doLockTwice, current Client: {}#{}, lock acquire 2 ...", name, j);
         // 再次获取锁（此处如果有其他线程使用锁，则需阻塞等待直到其释放才能获取）
         // 因为是可重入共享锁，所以两次都可以获取成功
-        boolean bool2 = lock.acquire(time, unit);
+        boolean bool2 = lock.acquire(TIME, UNIT);
         if (bool2) {
             log.info("doLockTwice, current Client: {}#{}, lock acquire 2 successfully", name, j);
         } else {

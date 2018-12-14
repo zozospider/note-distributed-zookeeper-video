@@ -69,7 +69,7 @@ public class InterProcessMutexMain {
                                 operator.doLockOnce(j);
 
                                 // 获取两次锁，再访问资源对象，然后释放两次锁（预计可顺利完成所有线程逻辑）
-                                operator.doLockTwice(j);
+//                                operator.doLockTwice(j);
                             }
 
                         } finally {
