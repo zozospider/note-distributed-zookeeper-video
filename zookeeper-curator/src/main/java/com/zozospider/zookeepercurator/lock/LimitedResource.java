@@ -19,7 +19,7 @@ public class LimitedResource {
      * 试图使用 source 资源，如果有其他线程正在使用，则会抛出异常。
      *
      * @param name 当前客户端名称
-     * @throws InterruptedException
+     * @throws InterruptedException 某个线程试图使用已经正在使用中的 source，则抛出异常提示资源被并发访问。
      */
     public void doSource(String name) throws InterruptedException {
 
