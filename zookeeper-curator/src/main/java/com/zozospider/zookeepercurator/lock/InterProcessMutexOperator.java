@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 可重入共享锁（Shared Reentrant Lock）
- * 同一个客户端在拥有锁的同时，可以在一个线程中多次调用 lock.acquire() 获取锁。
+ * 同一个客户端在拥有一个 InterProcessMutex 锁时，可以在一个线程中多次调用 lock.acquire() 获取锁。
+ * 不应该在多个线程中用同一个 InterProcessMutex。
  * <p>
  * acquire(): 获取锁
  * release(): 释放锁
