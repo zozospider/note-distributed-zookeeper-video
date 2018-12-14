@@ -50,24 +50,25 @@ public class InterProcessMutexOperator {
      *
      * @throws Exception
      */
-    public void doLock() throws Exception {
+    public void doLock(int j) throws Exception {
 
-        // 获取锁
+        log.info("doLock, current Client: {}#{}, lock acquire ...", name, j);
+        // 获取锁（此处如果有其他线程使用锁，则需阻塞等待直到其释放才能获取）
         boolean bool = lock.acquire(time, unit);
         if (bool) {
-            log.info("doLock, current Client: {}, lock acquire successfully", name);
+            log.info("doLock, current Client: {}#{}, lock acquire successfully", name, j);
         } else {
-            log.error("doLock, current Client: {}, lock acquire unsuccessfully", name);
+            log.error("doLock, current Client: {}#{}, lock acquire unsuccessfully", name, j);
             throw new InterruptedException("doLock, lock acquire unsuccessfully");
         }
         try {
             // 试图使用 source 资源，如果有其他线程正在使用，则会抛出异常。
-            log.info("doLock, current Client: {}, doing ...", name);
-            resource.doSource(name);
+            log.info("doLock, current Client: {}#{}, doing ...", name, j);
+            resource.doSource(name + "#" + j);
 
         } catch (Exception e) {
             // 有其他线程正在使用，则在此处理异常（仅供测试，理论上不会出现，因为 lock 已经加锁）
-            log.error("doLock, current Client: " + name + ", doSource error: " + e.getMessage(), e);
+            log.error("doLock, current Client: " + name + "#" + j + ", doSource error: " + e.getMessage(), e);
         } finally {
             // 释放锁
             lock.release();

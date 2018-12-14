@@ -5,6 +5,8 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -16,12 +18,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class InterProcessMutexMain {
 
+    private final static Logger log = LoggerFactory.getLogger(InterProcessMutexMain.class);
+
     // 需要加锁的路径
     private static final String LOCK_PATH = "/lock/InterProcessMutex";
     // 客户端数
-    private static final int CLIENT_QTY = 5;
+    private static final int CLIENT_QTY = 3;
     // 每个客户端调用 operator.doLock() 次数
-    private static final int DO_TIMES = 10;
+    private static final int DO_TIMES = 5;
 
     public static void main(String[] args) throws Exception {
 
@@ -36,9 +40,9 @@ public class InterProcessMutexMain {
 
         try {
 
-            // 新建 5 个异步任务
+            // 新建 3 个异步任务
             // 每个任务新建 1 个 Operator，包含 1 个 lock
-            // 每个任务调用 10 次 operator.doLock()
+            // 每个任务调用 5 次 operator.doLock()
             for (int i = 0; i < CLIENT_QTY; i++) {
                 final int ii = i;
 
@@ -53,13 +57,15 @@ public class InterProcessMutexMain {
                             // 启动客户端
                             client.start();
 
+                            log.info("execute task, Client: {}" + ii);
+
                             // 新建 1 个 Operator，包含 1 个 lock
-                            final InterProcessMutexOperator operator = new InterProcessMutexOperator(resource, "Client" + ii,
+                            final InterProcessMutexOperator operator = new InterProcessMutexOperator(resource, "C" + ii,
                                     client, LOCK_PATH);
-                            // 每个任务调用 10 次 operator.doLock()
+                            // 每个任务调用 5 次 operator.doLock()
                             for (int j = 0; j < DO_TIMES; j++) {
                                 // 获取锁并访问共享资源对象，完成后释放锁
-                                operator.doLock();
+                                operator.doLock(j);
                             }
 
                         } finally {
@@ -70,6 +76,7 @@ public class InterProcessMutexMain {
                     }
                 };
 
+                log.info("submit task, Client: {}" + ii);
                 // 提交异步任务
                 service.submit(task);
 
