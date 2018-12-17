@@ -20,12 +20,12 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
 
     private final static Logger log = LoggerFactory.getLogger(LeaderSelectorAdapter.class);
 
-    // 当前客户端 LeaderSelector 名称标识
+    // 客户端名称
     private final String name;
     // 真正参与选举的 LeaderSelector 对象
     private final LeaderSelector leaderSelector;
     // 统计
-    private final AtomicInteger leaderCount = new AtomicInteger();
+    private final AtomicInteger counter = new AtomicInteger();
 
     public LeaderSelectorAdapter(CuratorFramework client, String path, String name) {
         this.name = name;
@@ -34,7 +34,7 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
         leaderSelector.autoRequeue();
     }
 
-    public void start() throws IOException {
+    public void start() {
         leaderSelector.start();
     }
 
@@ -47,7 +47,7 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
     @Override
     public void takeLeadership(CuratorFramework client) {
 
-        log.info("current Client: {} is now the leader, It has been leader {} time(s) before ...", name, leaderCount.getAndIncrement());
+        log.info("current Client: {} is now the leader, It has been leader {} time(s) before ...", name, counter.getAndIncrement());
 
         // 随机等待时间（在此等待期间，该客户端为 Leader，方法结束后失去 Leader）
         final int waitSeconds = (int) (5 * Math.random()) + 1;

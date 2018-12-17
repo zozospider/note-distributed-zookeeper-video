@@ -19,12 +19,12 @@ public class LeaderLatchAdapter implements LeaderLatchListener, Closeable {
 
     private final static Logger log = LoggerFactory.getLogger(LeaderLatchAdapter.class);
 
-    // 当前客户端 LeaderSelector 名称标识
+    // 客户端名称
     private final String name;
     // 真正参与选举的 LeaderLatch 对象
     private final LeaderLatch leaderLatch;
     // 统计
-    private final AtomicInteger leaderCount = new AtomicInteger();
+    private final AtomicInteger counter = new AtomicInteger();
 
     public String getName() {
         return name;
@@ -37,8 +37,8 @@ public class LeaderLatchAdapter implements LeaderLatchListener, Closeable {
     public LeaderLatchAdapter(CuratorFramework client, String path, String name) {
         this.name = name;
         // 创建 LeaderLatch 对象，并实现自我监听
-        leaderLatch = new LeaderLatch(client, path, name);
-        leaderLatch.addListener(this);
+        this.leaderLatch = new LeaderLatch(client, path, name);
+        this.leaderLatch.addListener(this);
     }
 
     public void start() throws Exception {
@@ -50,7 +50,7 @@ public class LeaderLatchAdapter implements LeaderLatchListener, Closeable {
      */
     @Override
     public void isLeader() {
-        log.info("current Client: {} is now the leader, It has been leader {} time(s) before ...", name, leaderCount.getAndIncrement());
+        log.info("current Client: {} is now the leader, It has been leader {} time(s) before ...", name, counter.getAndIncrement());
     }
 
     @Override
