@@ -12,7 +12,7 @@ public class LimitedResource {
 
     private final static Logger log = LoggerFactory.getLogger(LimitedResource.class);
 
-    // source 资源，只可被单线程使用
+    // source 资源，假定只可被单线程使用，否则会出现并发问题。
     private final AtomicBoolean source = new AtomicBoolean(false);
 
     /**
