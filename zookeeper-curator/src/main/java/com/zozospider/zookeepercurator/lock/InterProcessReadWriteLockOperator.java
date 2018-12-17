@@ -81,6 +81,7 @@ public class InterProcessReadWriteLockOperator {
         } finally {
             // 释放写锁
             writeLock.release();
+            log.info("doWriteLock, current Client: {}#{}, writeLock has been released", name, j);
         }
 
     }
@@ -125,7 +126,9 @@ public class InterProcessReadWriteLockOperator {
         } finally {
             // 释放读写锁
             writeLock.release();
+            log.info("doWriteReadLock, current Client: {}#{}, writeLock has been released", name, j);
             readLock.release();
+            log.info("doWriteReadLock, current Client: {}#{}, readLock has been released", name, j);
         }
 
     }
@@ -183,8 +186,10 @@ public class InterProcessReadWriteLockOperator {
         } finally {
             // 释放读写锁（注意读锁需要释放两次）
             writeLock.release();
+            log.info("doWriteReadLockTwice, current Client: {}#{}, writeLock has been released", name, j);
             readLock.release();
             readLock.release();
+            log.info("doWriteReadLockTwice, current Client: {}#{}, readLock has been released twice", name, j);
         }
 
     }

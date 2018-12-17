@@ -74,6 +74,7 @@ public class InterProcessMutexOperator {
         } finally {
             // 释放锁
             lock.release();
+            log.info("doLockOnce, current Client: {}#{}, lock has been released", name, j);
         }
     }
 
@@ -120,6 +121,7 @@ public class InterProcessMutexOperator {
             // 释放两次锁
             lock.release();
             lock.release();
+            log.info("doLockOnce, current Client: {}#{}, lock has been released twice", name, j);
         }
 
     }

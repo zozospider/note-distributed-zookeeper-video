@@ -35,7 +35,7 @@ public class InterProcessSemaphoreMutexOperator {
     /**
      * 获取一次锁并访问共享资源对象，完成后释放一次锁
      * <p>
-     * （因为使用不可重入共享锁，此处只获取一次锁就释放，所以可以成功，失败情况请见 doLockTwiceIncorrectly() 方法）
+     * （此处只获取一次锁就释放，所以可以成功，失败情况请见 doLockTwiceIncorrectly() 方法）
      *
      * @param j 当前线程循环下标志
      * @throws Exception
@@ -63,6 +63,7 @@ public class InterProcessSemaphoreMutexOperator {
         } finally {
             // 释放锁
             lock.release();
+            log.info("doLockOnce, current Client: {}#{}, lock has been released", name, j);
         }
     }
 
@@ -110,6 +111,7 @@ public class InterProcessSemaphoreMutexOperator {
             // 释放锁
             lock.release();
             lock.release();
+            log.info("doLockTwiceIncorrectly, current Client: {}#{}, lock has been released twice", name, j);
         }
 
     }
