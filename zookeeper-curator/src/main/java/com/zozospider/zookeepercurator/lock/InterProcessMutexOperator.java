@@ -117,7 +117,7 @@ public class InterProcessMutexOperator {
             // 有其他线程正在使用，则在此处理 doSource 异常（仅供测试，理论上不会出现，因为 lock 已经加锁）
             log.error("doLockTwice, current Client: " + name + "#" + j + ", doSource error: " + e.getMessage(), e);
         } finally {
-            // 释放锁
+            // 释放两次锁
             lock.release();
             lock.release();
         }
