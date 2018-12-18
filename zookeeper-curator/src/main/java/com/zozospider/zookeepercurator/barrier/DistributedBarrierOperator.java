@@ -5,6 +5,9 @@ import org.apache.curator.framework.recipes.barriers.DistributedBarrier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 分布式屏障（DistributedBarrier）操作类
+ */
 public class DistributedBarrierOperator {
 
     private final static Logger log = LoggerFactory.getLogger(DistributedBarrierOperator.class);
@@ -31,7 +34,7 @@ public class DistributedBarrierOperator {
     }
 
     /**
-     * 等待
+     * 等待（如果设置了栅栏，此方法执行后会一直阻塞，直到其他客户端移除栅栏）
      *
      * @throws Exception
      */

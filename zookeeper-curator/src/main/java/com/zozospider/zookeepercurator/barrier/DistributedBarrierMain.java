@@ -14,6 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 分布式屏障（DistributedBarrier）
+ * <p>
+ * 它会阻塞所有节点上的等待进程（等待 waitOnBarrier()），直到某一个被满足（移除栅栏 removeBarrier()），然后所有的节点继续进行。
+ */
 public class DistributedBarrierMain {
 
     private final static Logger log = LoggerFactory.getLogger(DistributedBarrierMain.class);
@@ -59,7 +64,7 @@ public class DistributedBarrierMain {
 
                             Thread.sleep(1000 * new Random().nextInt(5));
 
-                            // 等待
+                            // 等待（此方法执行后会一直阻塞，直到其他客户端移除栅栏）
                             log.info("Client Ca{} waitOnBarrier begin", ii);
                             operator.waitOnBarrier();
                             log.info("Client Ca{} waitOnBarrier end", ii);
