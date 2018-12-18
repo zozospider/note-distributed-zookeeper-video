@@ -1,6 +1,5 @@
 package com.zozospider.zookeepercurator.barrier;
 
-import com.zozospider.zookeepercurator.counter.DistributedAtomicLongOperator;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.barriers.DistributedBarrier;
 import org.slf4j.Logger;
@@ -8,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class DistributedBarrierOperator {
 
-    private final static Logger log = LoggerFactory.getLogger(DistributedAtomicLongOperator.class);
+    private final static Logger log = LoggerFactory.getLogger(DistributedBarrierOperator.class);
 
     // 客户端名称
     private final String name;
@@ -37,8 +36,8 @@ public class DistributedBarrierOperator {
      * @throws Exception
      */
     public void waitOnBarrier() throws Exception {
-        log.info("waitOnBarrier, current Client: {} begin...", name);
-        // 如果设置了栅栏，此方法执行后会一直等待，直到其他客户端移除栅栏。
+        log.info("waitOnBarrier, current Client: {} begin ...", name);
+        // 如果设置了栅栏，此方法执行后会一直阻塞，直到其他客户端移除栅栏。
         barrier.waitOnBarrier();
         log.info("waitOnBarrier, current Client: {} end", name);
     }
@@ -49,7 +48,7 @@ public class DistributedBarrierOperator {
      * @throws Exception
      */
     public void removeBarrier() throws Exception {
-        log.info("removeBarrier, current Client: {} begin", name);
+        log.info("removeBarrier, current Client: {} begin ...", name);
         barrier.removeBarrier();
         log.info("removeBarrier, current Client: {} end", name);
     }

@@ -1,4 +1,4 @@
-package com.zozospider.zookeepercurator.counter;
+package com.zozospider.zookeepercurator.barrier;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -14,17 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 分布式 int 计数器（SharedCount）
- * 任意的 SharedCount， 只要使用相同的 path，都可以得到这个计数值。
- * <p>
- * 参考: DistributedAtomicLongMain.java
- */
-public class SharedCountMain {
+public class DistributedDoubleBarrierMain {
 
-    private final static Logger log = LoggerFactory.getLogger(SharedCountMain.class);
+    private final static Logger log = LoggerFactory.getLogger(DistributedDoubleBarrierMain.class);
 
-    private static final String PATH = "/counter/SharedCount";
+    private static final String PATH = "/counter/DistributedDoubleBarrier";
     private static final int CLIENT_QTY = 5;
 
     public static void main(String[] args) throws Exception {
@@ -37,7 +31,7 @@ public class SharedCountMain {
         try {
 
             // 新建 5 个异步任务（线程），模拟多个客户端参与计数逻辑
-            // 每个任务（线程）新建 1 个 Adapter，包含 1 个 SharedCount
+            // 每个任务（线程）新建 1 个 Operator，包含 1 个 DistributedBarrier
             for (int i = 0; i < CLIENT_QTY; i++) {
                 final int ii = i;
 
@@ -49,26 +43,32 @@ public class SharedCountMain {
                         CuratorFramework client = CuratorFrameworkFactory.newClient(
                                 server.getConnectString(), new RetryNTimes(3, 5000));
 
-                        // 新建 1 个 Operator，包含 1 个 SharedCount（也可使用匿名对象实现）
-                        SharedCountAdapter adapter = new SharedCountAdapter(client, PATH, "C" + ii);
                         try {
-                            // 启动客户端和适配器
+                            // 启动客户端
                             client.start();
-                            adapter.start();
                             log.info("execute task, C{}", ii);
 
-                            // 随机等待一段时间再执行，减少多个线程并发对计数器进行操作导致尝试新增失败的情况（注意，无法确保一定能更新成功）
-                            Thread.sleep(new Random().nextInt(8000));
+                            // 新建 1 个 Operator，包含 1 个 DistributedDoubleBarrier
+                            DistributedDoubleBarrierOperator operator =
+                                    new DistributedDoubleBarrierOperator(client, PATH, CLIENT_QTY, "C" + ii);
 
-                            // 在原有基础上尝试新增（注意，如上所示，有可能更新失败，因为并没有加锁控制多线程的并发更新问题）
-                            adapter.trySetCount(new Random().nextInt(10));
+                            // 等待一段时间，模拟不同客户端调用 enter() 时间不一致
+                            Thread.sleep(1000 * new Random().nextInt(20));
 
-                            // 等待一段时间再关闭 client 和 adapter，用于 SharedCountListener 监听
-                            Thread.sleep(new Random().nextInt(5000));
+                            // 进入，此方法会阻塞，直到所有客户端都调用结束
+                            log.info("Client C{} enter begin", ii);
+                            operator.enter();
+                            log.info("Client C{} enter end", ii);
+
+                            // 离开，此方法不会阻塞
+                            log.info("Client C{} leave begin", ii);
+                            operator.leave();
+                            log.info("Client C{} leave end", ii);
+
                         } finally {
                             CloseableUtils.closeQuietly(client);
-                            CloseableUtils.closeQuietly(adapter);
                         }
+
                         return null;
                     }
                 };

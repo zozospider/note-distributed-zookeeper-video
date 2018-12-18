@@ -26,8 +26,8 @@ public class DistributedBarrierMain {
         // 模拟服务端
         final TestingServer server = new TestingServer();
 
-        // 生成 2 * 5 个线程服务
-        ExecutorService service = Executors.newFixedThreadPool(2 * CLIENT_QTY);
+        // 生成 5 个线程服务
+        ExecutorService service = Executors.newFixedThreadPool(CLIENT_QTY);
         try {
 
             // 新建 5 个异步任务（线程），模拟多个客户端参与计数逻辑
@@ -49,14 +49,15 @@ public class DistributedBarrierMain {
                             log.info("execute task a, Ca{}", ii);
 
                             // 新建 1 个 Operator，包含 1 个 DistributedBarrier
-                            DistributedBarrierOperator operator = new DistributedBarrierOperator(client, PATH, "Ca" + ii);
+                            DistributedBarrierOperator operator =
+                                    new DistributedBarrierOperator(client, PATH, "Ca" + ii);
 
-                            log.info("Client Ca{} setBarrier begin", ii);
                             // 设置栅栏
+                            log.info("Client Ca{} setBarrier begin", ii);
                             operator.setBarrier();
                             log.info("Client Ca{} setBarrier end", ii);
 
-                            Thread.sleep(1000 * new Random().nextInt(10));
+                            Thread.sleep(1000 * new Random().nextInt(5));
 
                             // 等待
                             log.info("Client Ca{} waitOnBarrier begin", ii);
@@ -70,7 +71,6 @@ public class DistributedBarrierMain {
                         return null;
                     }
                 };
-
                 log.info("submit task a, Ca{}" + ii);
                 // 提交异步任务
                 service.submit(task);

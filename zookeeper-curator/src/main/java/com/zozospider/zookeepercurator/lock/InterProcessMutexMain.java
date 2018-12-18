@@ -78,16 +78,13 @@ public class InterProcessMutexMain {
                         return null;
                     }
                 };
-
                 log.info("submit task, Client: C{}", ii);
                 // 提交异步任务
                 service.submit(task);
-
             }
 
             service.shutdown();
             service.awaitTermination(10, TimeUnit.MINUTES);
-
         } finally {
             CloseableUtils.closeQuietly(server);
         }

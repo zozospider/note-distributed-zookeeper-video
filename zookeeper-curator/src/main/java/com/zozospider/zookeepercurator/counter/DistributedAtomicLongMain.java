@@ -85,7 +85,6 @@ public class DistributedAtomicLongMain {
                         return null;
                     }
                 };
-
                 log.info("submit task, C{}" + ii);
                 // 提交异步任务
                 service.submit(task);
@@ -93,7 +92,6 @@ public class DistributedAtomicLongMain {
 
             service.shutdown();
             service.awaitTermination(10, TimeUnit.MINUTES);
-
         } finally {
             CloseableUtils.closeQuietly(server);
         }
