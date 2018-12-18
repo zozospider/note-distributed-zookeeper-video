@@ -38,11 +38,14 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
 
     /**
      * 在原有基础上尝试新增（注意，此更新可能不成功）
+     * <p>
+     * 也可以在失败时多次调用该方法提高执行的成功率。
      *
      * @param add 增量
+     * @return 是否新增成功
      * @throws Exception
      */
-    public void trySetCount(int add) throws Exception {
+    public boolean trySetCount(int add) throws Exception {
 
         log.info("trySetCount, current Client: {}, count trySetCount add: {} ...", name, add);
         /**
@@ -57,6 +60,7 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
         } else {
             log.warn("trySetCount, current Client: {}, count trySetCount unsuccessfully", name);
         }
+        return bool;
     }
 
     /**
