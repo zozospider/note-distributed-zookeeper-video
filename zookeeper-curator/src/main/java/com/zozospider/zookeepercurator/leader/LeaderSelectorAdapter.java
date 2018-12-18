@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * LeaderSelector 适配器类
  * <p>
- * LeaderSelector 为其成员变量。同时实现了 new LeaderSelector() 构造方法的参数 LeaderSelectorListener 类。
+ * LeaderSelector 为其成员变量。同时实现了 new LeaderSelector() 构造方法的参数 LeaderSelectorListener 类。此 Listener 可以监听到选举的事件。
  */
 public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter implements Closeable {
 

@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 
+/**
+ * SharedCount 适配器类
+ * <p>
+ * SharedCount 为其成员变量。同时实现了 SharedCount.addListener() 方法的参数 SharedCountListener 类，此 Listener 可以监听到计数器的事件。
+ */
 public class SharedCountAdapter implements SharedCountListener, Closeable {
 
     private final static Logger log = LoggerFactory.getLogger(SharedCountAdapter.class);
@@ -32,7 +37,7 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
     }
 
     /**
-     * 在原有基础上尝试新增
+     * 在原有基础上尝试新增（注意，此更新可能不成功）
      *
      * @param add 增量
      * @throws Exception

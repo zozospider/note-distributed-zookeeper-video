@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * LeaderLatch 适配器类
  * <p>
- * LeaderLatch 为其成员变量。同时实现了 LeaderLatch.addListener() 方法的参数 LeaderLatchListener 类。
+ * LeaderLatch 为其成员变量。同时实现了 LeaderLatch.addListener() 方法的参数 LeaderLatchListener 类。此 Listener 可以监听到选举的事件。
  */
 public class LeaderLatchAdapter implements LeaderLatchListener, Closeable {
 

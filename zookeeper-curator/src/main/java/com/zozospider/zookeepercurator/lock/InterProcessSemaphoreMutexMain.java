@@ -32,12 +32,11 @@ public class InterProcessSemaphoreMutexMain {
         // 共享资源对象
         final LimitedResource resource = new LimitedResource();
 
-        // 生成 5 个线程服务
-        ExecutorService service = Executors.newFixedThreadPool(CLIENT_QTY);
-
         // 模拟服务端
         final TestingServer server = new TestingServer();
 
+        // 生成 5 个线程服务
+        ExecutorService service = Executors.newFixedThreadPool(CLIENT_QTY);
         try {
 
             // 新建 3 个异步任务（线程）

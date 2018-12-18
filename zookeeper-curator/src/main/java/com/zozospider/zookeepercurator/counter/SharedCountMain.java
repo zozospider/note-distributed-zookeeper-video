@@ -1,6 +1,5 @@
 package com.zozospider.zookeepercurator.counter;
 
-import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
@@ -9,13 +8,16 @@ import org.apache.curator.utils.CloseableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 分布式 int 计数器（SharedCount）
+ * 任意的 SharedCount， 只要使用相同的 path，都可以得到这个计数值。
+ */
 public class SharedCountMain {
 
     private final static Logger log = LoggerFactory.getLogger(SharedCountMain.class);
@@ -24,12 +26,6 @@ public class SharedCountMain {
     private static final int CLIENT_QTY = 5;
 
     public static void main(String[] args) throws Exception {
-
-        // 模拟多个客户端
-        List<CuratorFramework> clients = Lists.newArrayList();
-
-        // 多个 SharedCountAdapter 计数器对象适配器
-        List<SharedCountAdapter> adapters = Lists.newArrayList();
 
         // 模拟服务端
         final TestingServer server = new TestingServer();
