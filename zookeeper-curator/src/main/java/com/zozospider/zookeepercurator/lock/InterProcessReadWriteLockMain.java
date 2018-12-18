@@ -56,7 +56,7 @@ public class InterProcessReadWriteLockMain {
                         try {
                             // 启动客户端
                             client.start();
-                            log.info("execute task, Client: {}" + ii);
+                            log.info("execute task, Client: C{}", ii);
 
                             // 新建 1 个 Operator，包含 1 个 lock
                             final InterProcessReadWriteLockOperator operator = new InterProcessReadWriteLockOperator(resource, "C" + ii,
@@ -83,7 +83,7 @@ public class InterProcessReadWriteLockMain {
                     }
                 };
 
-                log.info("submit task, Client: {}" + ii);
+                log.info("submit task, Client: C{}", ii);
                 // 提交异步任务
                 service.submit(task);
 

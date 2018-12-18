@@ -38,6 +38,8 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
      * @throws Exception
      */
     public void trySetCount(int add) throws Exception {
+
+        log.info("trySetCount, current Client: {}, count trySetCount add: {} ...", name, add);
         /**
          * 尝试更新
          *
@@ -69,13 +71,13 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
     }
 
     @Override
-    public void countHasChanged(SharedCountReader sharedCount, int newCount) throws Exception {
-        log.info("Counter's value is changed to {}", newCount);
+    public void countHasChanged(SharedCountReader sharedCount, int newCount) {
+        log.info("current Client: {}, Counter's value is changed to {}", name, newCount);
     }
 
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
-        log.info("State changed: {}", newState.toString());
+        log.info("current Client: {}, State changed: {}", name, newState.toString());
     }
 
     @Override
