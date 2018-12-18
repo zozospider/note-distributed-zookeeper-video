@@ -8,23 +8,23 @@ import org.apache.curator.utils.CloseableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 分布式 int 计数器（SharedCount）
- * 任意的 SharedCount， 只要使用相同的 path，都可以得到这个计数值。
+ * 分布式 long 计数器（DistributedAtomicLong）
+ * 1. 计数的范围比 SharedCount 大。
+ * 2. 它首先尝试使用乐观锁的方式设置计数器，如果不成功（比如期间计数器已经被其它client更新了），则使用 InterProcessMutex 方式来更新计数值。
  * <p>
- * 参考: DistributedAtomicLongMain.java
+ * 参考: SharedCountMain.java
  */
-public class SharedCountMain {
+public class DistributedAtomicLongMain {
 
-    private final static Logger log = LoggerFactory.getLogger(SharedCountMain.class);
+    private final static Logger log = LoggerFactory.getLogger(DistributedAtomicLongMain.class);
 
-    private static final String PATH = "/counter/SharedCount";
+    private static final String PATH = "/counter/DistributedAtomicLong";
     private static final int CLIENT_QTY = 5;
 
     public static void main(String[] args) throws Exception {
@@ -37,7 +37,7 @@ public class SharedCountMain {
         try {
 
             // 新建 5 个异步任务（线程），模拟多个客户端参与计数逻辑
-            // 每个任务（线程）新建 1 个 Adapter，包含 1 个 SharedCount
+            // 每个任务（线程）新建 1 个 Operator，包含 1 个 DistributedAtomicLong
             for (int i = 0; i < CLIENT_QTY; i++) {
                 final int ii = i;
 
@@ -49,26 +49,39 @@ public class SharedCountMain {
                         CuratorFramework client = CuratorFrameworkFactory.newClient(
                                 server.getConnectString(), new RetryNTimes(3, 5000));
 
-                        // 新建 1 个 Operator，包含 1 个 SharedCount（也可使用匿名对象实现）
-                        SharedCountAdapter adapter = new SharedCountAdapter(client, PATH, "C" + ii);
                         try {
-                            // 启动客户端和适配器
+                            // 启动客户端
                             client.start();
-                            adapter.start();
                             log.info("execute task, C{}", ii);
 
-                            // 随机等待一段时间再执行，减少多个线程并发对计数器进行操作导致尝试新增失败的情况（注意，无法确保一定能更新成功）
-                            Thread.sleep(new Random().nextInt(8000));
+                            // 新建 1 个 Operator，包含 1 个 DistributedAtomicLong
+                            DistributedAtomicLongOperator operator = new DistributedAtomicLongOperator(client, PATH, "C" + ii);
 
-                            // 在原有基础上尝试新增（注意，如上所示，有可能更新失败，因为并没有加锁控制多线程的并发更新问题）
-                            adapter.trySetCount(new Random().nextInt(10));
+                            // 加一
+                            operator.increment();
 
-                            // 等待一段时间再关闭 client 和 adapter，用于 SharedCountListener 监听
-                            Thread.sleep(new Random().nextInt(5000));
+                            // 减一
+//                            operator.decrement();
+
+                            // 增加特定的值
+//                            operator.add(new Random().nextInt(10));
+
+                            // 减去特定的值
+//                            operator.subtract(new Random().nextInt(10));
+
+                            // 尝试更新（注意，此更新可能不成功）
+//                            operator.trySet(new Random().nextInt(10));
+
+                            // 强制更新
+//                            operator.forceSet(new Random().nextInt(10));
+
+                            // 获取当前值
+                            operator.get();
+
                         } finally {
                             CloseableUtils.closeQuietly(client);
-                            CloseableUtils.closeQuietly(adapter);
                         }
+
                         return null;
                     }
                 };

@@ -37,46 +37,73 @@ public class SharedCountAdapter implements SharedCountListener, Closeable {
     }
 
     /**
-     * 在原有基础上尝试新增（注意，此更新可能不成功）
+     * 尝试更新（注意，此更新可能不成功）
      * <p>
      * 也可以在失败时多次调用该方法提高执行的成功率。
      *
-     * @param add 增量
-     * @return 是否新增成功
+     * @param newValue 更新后的最新指
+     * @return 是否更新成功
      * @throws Exception
      */
-    public boolean trySetCount(int add) throws Exception {
+    public boolean trySetCount(int newValue) throws Exception {
 
-        log.info("trySetCount, current Client: {}, count trySetCount add: {} ...", name, add);
+        log.info("newValue, current Client: {}, count trySetCount newValue: {} ...", name, newValue);
         /**
          * 尝试更新
          *
          * VersionedValue: 当前的 VersionedValue，如果期间其它 client 更新了此计数值，此次更新可能不成功。
          * newCount: 最新值
          */
-        boolean bool = count.trySetCount(count.getVersionedValue(), count.getCount() + add);
+        boolean bool = count.trySetCount(count.getVersionedValue(), newValue);
         if (bool) {
-            log.info("trySetCount, current Client: {}, count trySetCount successfully", name);
+            log.info("newValue, current Client: {}, count trySetCount successfully", name);
         } else {
-            log.warn("trySetCount, current Client: {}, count trySetCount unsuccessfully", name);
+            log.warn("newValue, current Client: {}, count trySetCount unsuccessfully", name);
         }
         return bool;
     }
 
     /**
-     * 在原有基础上强制新增
+     * trySetCount() 的扩展方法，在原有基础上尝试新增（注意，此更新可能不成功）
+     *
+     * @param add 增量
+     * @return 是否新增成功
+     * @throws Exception
+     */
+    public boolean trySetCountAdd(int add) throws Exception {
+
+        log.info("trySetCountAdd, current Client: {}, count trySetCount add: {} ...", name, add);
+        boolean bool = count.trySetCount(count.getVersionedValue(), count.getCount() + add);
+        if (bool) {
+            log.info("trySetCountAdd, current Client: {}, count trySetCount add successfully", name);
+        } else {
+            log.warn("trySetCountAdd, current Client: {}, count trySetCount add unsuccessfully", name);
+        }
+        return bool;
+    }
+
+    /**
+     * 强制更新
+     *
+     * @param newValue 更新后的最新指
+     * @throws Exception
+     */
+    public void setCount(int newValue) throws Exception {
+
+        count.setCount(newValue);
+        log.info("setCount, current Client: {}, count setCount newValue: {} successfully", name, newValue);
+    }
+
+    /**
+     * setCount() 的扩展方法，在原有基础上强制新增
      *
      * @param add 增量
      * @throws Exception
      */
-    public void setCount(int add) throws Exception {
-        /**
-         * 强制更新
-         *
-         * newCount: 最新值
-         */
+    public void setCountAdd(int add) throws Exception {
+
         count.setCount(count.getCount() + add);
-        log.info("setCount, current Client: {}, count setCount successfully", name);
+        log.info("setCountAdd, current Client: {}, count setCount add:{} successfully", name, add);
     }
 
     @Override

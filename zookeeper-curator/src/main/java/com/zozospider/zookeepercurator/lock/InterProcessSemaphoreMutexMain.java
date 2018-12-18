@@ -35,7 +35,7 @@ public class InterProcessSemaphoreMutexMain {
         // 模拟服务端
         final TestingServer server = new TestingServer();
 
-        // 生成 5 个线程服务
+        // 生成 3 个线程服务
         ExecutorService service = Executors.newFixedThreadPool(CLIENT_QTY);
         try {
 
