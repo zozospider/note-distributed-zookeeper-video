@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 分布式 long 计数器（DistributedAtomicLong）
  * 1. 计数的范围比 SharedCount 大。
- * 2. 它首先尝试使用乐观锁的方式设置计数器，如果不成功（比如期间计数器已经被其它client更新了），则使用 InterProcessMutex 方式来更新计数值。
+ * 2. 它首先尝试使用乐观锁的方式设置计数器，如果不成功（比如期间计数器已经被其它client更新了），则使用 InterProcessMutex（可重入共享锁）方式来更新计数值。
  * <p>
  * 参考: SharedCountMain.java
  */
