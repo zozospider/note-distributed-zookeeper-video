@@ -13,16 +13,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 模拟多个客户端多个线程调用：多共享锁对象（Multi Shared Lock）
- */
-public class InterProcessMultiLockMain {
+public class CustomizeLockMain {
 
-    private final static Logger log = LoggerFactory.getLogger(InterProcessMultiLockMain.class);
+    private final static Logger log = LoggerFactory.getLogger(InterProcessMutexMain.class);
 
     // 需要加锁的路径
-    private static final String LOCK_PATH_1 = "/lock/InterProcessMultiLock1";
-    private static final String LOCK_PATH_2 = "/lock/InterProcessMultiLock2";
+    private static final String LOCK_PATH = "/lock/CustomizeLock";
     // 客户端数
     private static final int CLIENT_QTY = 3;
     // 每个客户端调用 operator.doLock() 次数
@@ -38,6 +34,7 @@ public class InterProcessMultiLockMain {
 
         // 生成 3 个线程服务
         ExecutorService service = Executors.newFixedThreadPool(CLIENT_QTY);
+
         try {
 
             // 新建 3 个异步任务（线程）
@@ -58,19 +55,14 @@ public class InterProcessMultiLockMain {
                             client.start();
                             log.info("execute task, Client: C{}", ii);
 
-                            // 新建 1 个 Operator，包含 1 个 multiLock
-                            final InterProcessMultiLockOperator operator = new InterProcessMultiLockOperator(resource, "C" + ii,
-                                    client, LOCK_PATH_1, LOCK_PATH_2);
+                            // 新建 1 个 Operator，包含 1 个 lock
+                            CustomizeLockOperator operator = new CustomizeLockOperator(resource, "C" + ii,
+                                    client, LOCK_PATH);
                             // 每个任务（线程）调用 5 次 operator.doLock()
                             for (int j = 0; j < DO_TIMES; j++) {
 
                                 // 获取一次锁并访问共享资源对象，完成后释放一次锁（预计可顺利完成所有线程逻辑）
                                 operator.doLockOnce(j);
-
-                                // 获取两次锁，再访问资源对象，然后释放两次锁（预计在第一个线程第一次获取锁之后所有逻辑都会失败）
-                                // 因为锁容器存在不可重入共享锁，所以会出现不可重入共享锁的情况
-                                // 由于该方法第一次获取到锁后被阻塞导致锁没有释放，所以后续所有线程获取锁都会失败
-//                                operator.doLockTwiceIncorrectly(j);
                             }
                         } finally {
                             CloseableUtils.closeQuietly(client);

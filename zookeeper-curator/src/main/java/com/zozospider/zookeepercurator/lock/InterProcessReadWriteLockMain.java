@@ -60,7 +60,6 @@ public class InterProcessReadWriteLockMain {
                             // 新建 1 个 Operator，包含 1 个 lock
                             final InterProcessReadWriteLockOperator operator = new InterProcessReadWriteLockOperator(resource, "C" + ii,
                                     client, LOCK_PATH);
-
                             // 每个任务（线程）调用 5 次 operator.doLock()
                             for (int j = 0; j < DO_TIMES; j++) {
 
@@ -73,14 +72,13 @@ public class InterProcessReadWriteLockMain {
                                 // 获取一次读锁，两次写锁，并访问共享资源对象，完成后释放一次读锁，两次写锁（预计可顺利完成所有线程逻辑）
 //                                operator.doWriteReadLockTwice(j);
                             }
-
                         } finally {
                             CloseableUtils.closeQuietly(client);
                         }
-
                         return null;
                     }
                 };
+
                 log.info("submit task, Client: C{}", ii);
                 // 提交异步任务
                 service.submit(task);

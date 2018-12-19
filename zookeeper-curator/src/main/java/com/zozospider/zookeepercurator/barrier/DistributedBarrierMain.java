@@ -47,7 +47,6 @@ public class DistributedBarrierMain {
                         // 新建客户端连接
                         CuratorFramework client = CuratorFrameworkFactory.newClient(
                                 server.getConnectString(), new RetryNTimes(3, 5000));
-
                         try {
                             // 启动客户端
                             client.start();
@@ -72,10 +71,10 @@ public class DistributedBarrierMain {
                         } finally {
                             CloseableUtils.closeQuietly(client);
                         }
-
                         return null;
                     }
                 };
+
                 log.info("submit task a, Ca{}" + ii);
                 // 提交异步任务
                 service.submit(task);

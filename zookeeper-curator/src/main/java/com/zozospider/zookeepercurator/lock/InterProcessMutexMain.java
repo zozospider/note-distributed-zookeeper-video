@@ -60,7 +60,6 @@ public class InterProcessMutexMain {
                             // 新建 1 个 Operator，包含 1 个 lock
                             final InterProcessMutexOperator operator = new InterProcessMutexOperator(resource, "C" + ii,
                                     client, LOCK_PATH);
-
                             // 每个任务（线程）调用 5 次 operator.doLock()
                             for (int j = 0; j < DO_TIMES; j++) {
 
@@ -70,14 +69,13 @@ public class InterProcessMutexMain {
                                 // 获取两次锁，再访问资源对象，然后释放两次锁（预计可顺利完成所有线程逻辑）
 //                                operator.doLockTwice(j);
                             }
-
                         } finally {
                             CloseableUtils.closeQuietly(client);
                         }
-
                         return null;
                     }
                 };
+
                 log.info("submit task, Client: C{}", ii);
                 // 提交异步任务
                 service.submit(task);

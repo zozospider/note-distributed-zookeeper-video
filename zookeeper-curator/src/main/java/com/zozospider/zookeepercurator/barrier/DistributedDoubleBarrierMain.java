@@ -48,7 +48,6 @@ public class DistributedDoubleBarrierMain {
                         // 新建客户端连接
                         CuratorFramework client = CuratorFrameworkFactory.newClient(
                                 server.getConnectString(), new RetryNTimes(3, 5000));
-
                         try {
                             // 启动客户端
                             client.start();
@@ -78,7 +77,6 @@ public class DistributedDoubleBarrierMain {
                         } finally {
                             CloseableUtils.closeQuietly(client);
                         }
-
                         return null;
                     }
                 };
