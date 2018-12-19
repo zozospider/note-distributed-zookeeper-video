@@ -1,5 +1,7 @@
-package com.zozospider.zookeepercurator.lock;
+package com.zozospider.zookeepercurator.lock.customize;
 
+import com.zozospider.zookeepercurator.lock.InterProcessMutexOperator;
+import com.zozospider.zookeepercurator.lock.LimitedResource;
 import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.zozospider.zookeepercurator.lock;
+package com.zozospider.zookeepercurator.lock.customize;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;

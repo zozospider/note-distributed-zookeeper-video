@@ -1,5 +1,7 @@
-package com.zozospider.zookeepercurator.lock;
+package com.zozospider.zookeepercurator.lock.customize;
 
+import com.zozospider.zookeepercurator.lock.InterProcessMutexMain;
+import com.zozospider.zookeepercurator.lock.LimitedResource;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
