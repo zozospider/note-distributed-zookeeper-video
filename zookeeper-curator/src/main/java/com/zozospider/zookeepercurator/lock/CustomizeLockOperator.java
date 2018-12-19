@@ -4,6 +4,9 @@ import org.apache.curator.framework.CuratorFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 自定义分布式锁（未成功实现）
+ */
 public class CustomizeLockOperator {
 
     private final static Logger log = LoggerFactory.getLogger(InterProcessMutexOperator.class);
@@ -19,6 +22,7 @@ public class CustomizeLockOperator {
                                  CuratorFramework client, String lockPath) throws Exception {
         this.resource = resource;
         this.name = name;
+        log.info("CustomizeLockOperator, Client: C{}", name);
         // 通过 client 和 lockPath 确定一个锁
         lock = new CustomizeLock(client, lockPath);
     }

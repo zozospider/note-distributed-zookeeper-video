@@ -13,6 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 自定义分布式锁（未成功实现）
+ */
 public class CustomizeLockMain {
 
     private final static Logger log = LoggerFactory.getLogger(InterProcessMutexMain.class);

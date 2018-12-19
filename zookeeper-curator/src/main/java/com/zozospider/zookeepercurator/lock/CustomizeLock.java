@@ -10,10 +10,12 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 自定义分布式锁
+ * 自定义分布式锁（未成功实现）
  */
 public class CustomizeLock {
 
@@ -44,23 +46,38 @@ public class CustomizeLock {
      * @throws Exception
      */
     public void init() throws Exception {
+        log.info("stat begin");
+
+        final int waitSeconds = (int) (5 * Math.random()) + 1;
+        Thread.sleep(TimeUnit.SECONDS.toMillis(new Random().nextInt(waitSeconds)));
+
         Stat stat = client.checkExists().forPath(LOCK_PATH);
         if (stat == null) {
+            log.info("create begin");
             // 创建节点
-            client.create()
-                    .creatingParentsIfNeeded()
-                    .withMode(CreateMode.PERSISTENT)
-                    .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
-                    .forPath(LOCK_PATH);
+            try {
+                String s = client.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
+                        .forPath(LOCK_PATH);
+            } catch (Exception e) {
+                log.error("create error: e: " + e.getMessage(), e);
+                throw new Exception("create error");
+            }
+            log.info("create end");
         }
+        log.info("stat end");
+        log.info("addWatch begin");
         // 添加监听
         addWatch();
+        log.info("addWatch end");
     }
 
     public void addWatch() throws Exception {
 
         // 子节点监听对象
-        final PathChildrenCache cache = new PathChildrenCache(client, path, true);
+        final PathChildrenCache cache = new PathChildrenCache(client, LOCK_PATH, true);
         cache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
 
         // 添加监听
