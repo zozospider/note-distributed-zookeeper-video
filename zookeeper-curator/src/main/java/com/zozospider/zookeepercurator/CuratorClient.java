@@ -29,10 +29,13 @@ public class CuratorClient {
     private final static Logger log = LoggerFactory.getLogger(CuratorClient.class);
 
     /**
-     * 指定连接的超时时间
+     * session 超时时间
      */
     private static final int SESSION_TIMEOUT = 5000;
 
+    /**
+     * 连接超时时间
+     */
     private static final int CONNECTION_TIMEOUT = 5000;
 
     private static final String NAME_SPACE = "namespace";
